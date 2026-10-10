@@ -1,3 +1,17 @@
 ent-CardboardBoxLargeDetectiveFilled = набор детектива
     .suffix = Заполненный
     .desc = { ent-CardboardBoxLargeSecurity.desc }
+ent-CardboardBoxLargeCargoRoundstart = коробка логистических припасов
+    .suffix = Логистика, Раундстарт
+    .desc = { ent-CardboardBoxLargeCargo.desc }
+ent-CardboardBoxLargeEngiRoundstart = коробка инженерных припасов
+    .suffix = Инженерный, Раундстарт
+    .desc = { ent-CardboardBoxLargeEngi.desc }
+ent-CardboardBoxLargeBureaucracy = коробка офисных припасов
+    .suffix = Офис
+    .desc = { ent-CardboardBoxLarge.desc }
+ent-CardboardBoxLargeServiceJani = коробка уборочных припасов
+    .suffix = Уборщик
+    .desc = { ent-CardboardBoxLargeService.desc }
+ent-CardboardBoxLargeInternalsFilled = коробка средств дыхания
+    .desc = { ent-CardboardBoxLargeInternals.desc }
