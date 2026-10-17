@@ -413,9 +413,13 @@ ui-options-speech-bubble-speaker-opacity = Непрозрачность дикт
 ui-options-speech-bubble-background-opacity = Непрозрачность фона речевого пузыря
 
 # funky custom interaction outlines
+ui-options-interaction-outline-header = Настройки контура взаимодействия
+ui-options-use-custom-interaction-outline-color = Использовать настраиваемые цвета контура
+ui-options-interaction-outline-color-expand = Расширить настройки цвета контура взаимодействия
 ui-options-interaction-outline-valid = Цвет контура для объектов, находящихся в пределах области взаимодействия
 ui-options-interaction-outline-invalid = Цвет контура для объектов, находящихся за пределами области взаимодействия
 ui-options-interaction-color-example = Это цвет контура.
+
 ui-options-color-slider-default-button = Сбросить до значений по умолчанию
 
 ui-options-censor-nudity = Цензура обнажённых персонажей
