@@ -1093,4 +1093,51 @@
   id: 128
   time: '2026-10-09T02:34:13Z'
   url: https://github.com/funky-station/forky-station/pull/575
+- author: mkanke
+  changes:
+  - message: Explosives can now be set to have 5 and 1 second timers
+    type: Tweak
+  id: 129
+  time: '2026-10-10T18:02:41Z'
+  url: https://github.com/funky-station/forky-station/pull/526
+- author: metalgearsloth, mycobiota
+  changes:
+  - message: Fix interaction outline not scaling with zoom. (by metalgearsloth, cherrypicked
+      by mycobiota)
+    type: Fix
+  - message: Tidied up interaction outline color settings in the accessibility settings.
+    type: Tweak
+  - message: Added a checkbox to enable/disable custom interaction outline colors.
+    type: Add
+  id: 130
+  time: '2026-10-10T18:04:50Z'
+  url: https://github.com/funky-station/forky-station/pull/574
+- author: gaesnek
+  changes:
+  - message: Removed Meowls.
+    type: Remove
+  id: 131
+  time: '2026-10-12T03:30:51Z'
+  url: https://github.com/funky-station/forky-station/pull/577
+- author: mkanke
+  changes:
+  - message: Service blinker lights are now craftable
+    type: Add
+  id: 132
+  time: '2026-10-16T18:44:11Z'
+  url: https://github.com/funky-station/forky-station/pull/398
+- author: ClocksAreWorthy
+  changes:
+  - message: 9 variations the comfy chair
+    type: Add
+  id: 133
+  time: '2026-10-16T18:45:23Z'
+  url: https://github.com/funky-station/forky-station/pull/416
+- author: mkanke, Gosera
+  changes:
+  - message: Ported small pinboard from old Funky
+    type: Add
+  id: 134
+  time: '2026-10-17T00:01:48Z'
+  url: https://github.com/funky-station/forky-station/pull/273
 Order: -1
