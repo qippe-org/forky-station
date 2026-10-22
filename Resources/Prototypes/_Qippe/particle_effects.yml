@@ -1,0 +1,23 @@
+- type: particleEffect
+  id: Bullet
+  sprite:
+    sprite: _Starfall/Particles/generic.rsi
+    state: cross
+  shader: unshaded
+  startColor: "#c8c8c8bf"
+  endColor: "#c8c8c866"
+  particleSize: 0.33
+  sizeVariance: 0.1
+  stretchFactor: 0.2
+  lifetime: 1.5
+  lifetimeVariance: 1.5
+  speed: 0.05
+  speedVariance: 0.02
+  gravity: 0.05
+  startRotationVariance: 180
+  emissionRate: 100
+  maxCount: 200
+  shape:
+    type: Point
+    radius: 0.1
+  spreadAngle: 360

@@ -45,6 +45,8 @@
       path: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
   - type: TimedDespawn
     lifetime: 10
+  - type: ParticleEmitter
+    effect: Bullet
 
 - type: entity
   parent: BaseBullet
