@@ -45,6 +45,8 @@
     count: 10
   - type: TimedDespawn
     lifetime: 0.25
+  - type: ParticleEmitter
+    effect: GrenadeProjectile
 
 - type: entity
   parent: BaseBullet
