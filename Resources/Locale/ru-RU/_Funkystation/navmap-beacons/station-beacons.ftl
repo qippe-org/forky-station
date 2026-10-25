@@ -1,6 +1,7 @@
 station-beacon-logistics = Логистика
 
 station-beacon-cl = Офис связного Центком
+station-beacon-hd = Офис директора по гостеприимству
 
 station-beacon-commandant = Офис коменданта
 station-beacon-dispatch = Диспетчерская
@@ -25,3 +26,9 @@ station-beacon-mailroom = Почтовая комната
 
 station-beacon-reactor = Камера реактора
 station-beacon-sm = Камера суперматерии
+station-beacon-sistr = Ядро SIS/TR
+station-beacon-shuttles = Мастерская по ремонту шаттлов
+
+station-beacon-laundromat = Прачечная
+station-beacon-park = Парк
+station-beacon-restaurant = Ресторан
