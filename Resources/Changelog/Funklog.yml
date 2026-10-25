@@ -1163,4 +1163,34 @@
   id: 137
   time: '2026-10-22T07:37:58Z'
   url: https://github.com/funky-station/forky-station/pull/514
+- author: mkanke
+  changes:
+  - message: Vendor restocks can now be stored on boxshelves and carts
+    type: Add
+  - message: Boxshelves no longer deleted their contents on being broken
+    type: Fix
+  id: 138
+  time: '2026-10-22T12:52:58Z'
+  url: https://github.com/funky-station/forky-station/pull/518
+- author: mkanke-real
+  changes:
+  - message: Newstations can now be selected in the loadout screen
+    type: Add
+  id: 139
+  time: '2026-10-22T13:33:27Z'
+  url: https://github.com/funky-station/forky-station/pull/567
+- author: PopUpPuppygirl
+  changes:
+  - message: Meowls!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    type: Add
+  id: 140
+  time: '2026-10-25T05:21:00Z'
+  url: https://github.com/funky-station/forky-station/pull/581
+- author: PopupPup
+  changes:
+  - message: Marisa
+    type: Fix
+  id: 141
+  time: '2026-10-25T05:49:17Z'
+  url: https://github.com/funky-station/forky-station/pull/585
 Order: -1
