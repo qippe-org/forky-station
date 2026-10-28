@@ -1,4 +1,5 @@
 using Content.Client._Funkystation.Explosion; // Funky RMC explosions
+using Content.Client._Qippe.Overlays;
 using Content.Client.Administration.Managers;
 using Content.Client.Changelog;
 using Content.Client.Chat.Managers;
@@ -170,6 +171,7 @@ namespace Content.Client.Entry
             _overlayManager.AddOverlay(new RadiationPulseOverlay());
             _overlayManager.AddOverlay(new ScreechShockWaveOverlay());
             _overlayManager.AddOverlay(new ExplosionShockWaveOverlay()); // Funky RMC Explosions
+            _overlayManager.AddOverlay(new ChromaticAberrationOverlay());
             _chatManager.Initialize();
             _clientPreferencesManager.Initialize();
             _euiManager.Initialize();

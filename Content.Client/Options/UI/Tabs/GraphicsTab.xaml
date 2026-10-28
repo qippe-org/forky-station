@@ -53,6 +53,11 @@
                     Title="{Loc 'ui-options-lobby-bottom-color'}"
                     Example="{Loc 'ui-options-lobby-bottom-color-example'}"/>
 
+                <!-- Overlays -->
+                <CheckBox Name="ChromaticAberrationCheckBox" Text="{Loc 'ui-options-ca-enable'}"/>
+                <ui:OptionSlider Name="ChromaticAberrationIntensitySlider" Title="{Loc 'ui-options-ca-intensity'}"/>
+                <ui:OptionSlider Name="ChromaticAberrationThresholdSlider" Title="{Loc 'ui-options-ca-threshold'}"/>
+
                 <!-- Misc -->
                 <Label Text="{Loc 'ui-options-misc-label'}" StyleClasses="LabelKeyText"/>
                 <CheckBox Name="FpsCounterCheckBox" Text="{Loc 'ui-options-fps-counter'}" />
