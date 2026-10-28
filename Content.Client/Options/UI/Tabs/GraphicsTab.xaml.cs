@@ -95,6 +95,10 @@ public sealed partial class GraphicsTab : Control
         Control.AddOptionColorSlider(QVars.GradientColorTop, TopColorSlider);
         Control.AddOptionColorSlider(QVars.GradientColorBottom, BottomColorSlider);
 
+        Control.AddOptionCheckBox(QVars.ChromaticAberrationEnabled, ChromaticAberrationCheckBox);
+        Control.AddOptionPercentSlider(QVars.ChromaticAberrationIntensity, ChromaticAberrationIntensitySlider, 0.1f, 5f);
+        Control.AddOptionPercentSlider(QVars.ChromaticAberrationThreshold, ChromaticAberrationThresholdSlider, 0.1f, 5f);
+
         Control.Initialize();
 
         _cfg.OnValueChanged(CCVars.ViewportMinimumWidth, _ => UpdateViewportWidthRange());

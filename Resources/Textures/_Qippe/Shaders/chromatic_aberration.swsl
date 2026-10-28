@@ -1,0 +1,44 @@
+// https://godotshaders.com/shader/radial-chromatic-aberration-2/
+// License: CC0
+
+uniform highp float intensity;
+uniform highp float threshold;
+
+uniform sampler2D SCREEN_TEXTURE;
+
+highp float vector_angle(highp vec2 v) {
+    if (abs(v.x) < 0.0001 && abs(v.y) < 0.0001) {
+        return 0.0; // Default angle for zero vector
+    }
+    return atan(v.y, v.x);
+}
+
+highp vec2 rotate_vector(highp vec2 v, highp float cos_theta, highp float sin_theta) {
+    return vec2(
+        v.x * cos_theta - v.y * sin_theta,
+        v.x * sin_theta + v.y * cos_theta
+    );
+}
+
+void fragment() {
+	highp vec2 r_displacement = vec2(-1.0, 0.0);
+	highp vec2 g_displacement = vec2(0.0, 0.0);
+	highp vec2 b_displacement = vec2(1.0, 0.0);
+
+	highp vec2 center = vec2(0.5);
+	highp vec2 dir = UV - center;
+	highp float angle = vector_angle(dir);
+	highp float dist = 2.0 * length(dir);
+	highp float effect = exp(intensity * (dist - threshold));
+
+	r_displacement = rotate_vector(effect * intensity * r_displacement, cos(angle), sin(angle));
+	g_displacement = rotate_vector(effect * intensity * g_displacement, cos(angle), sin(angle));
+	b_displacement = rotate_vector(effect * intensity * b_displacement, cos(angle), sin(angle));
+
+	highp float r = texture(SCREEN_TEXTURE, (r_displacement * SCREEN_PIXEL_SIZE) + UV, 0.0).r; // SCREEN_TEXTURE, fma(displacement, pixel_size, uv), 0.0
+	highp float g = texture(SCREEN_TEXTURE, (g_displacement * SCREEN_PIXEL_SIZE) + UV, 0.0).g; // SCREEN_TEXTURE, fma(displacement, pixel_size, uv), 0.0
+	highp float b = texture(SCREEN_TEXTURE, (b_displacement * SCREEN_PIXEL_SIZE) + UV, 0.0).b; // SCREEN_TEXTURE, fma(displacement, pixel_size, uv), 0.0
+	highp float a = texture(SCREEN_TEXTURE, UV).a;
+
+	COLOR = vec4(r, g, b, a);
+}

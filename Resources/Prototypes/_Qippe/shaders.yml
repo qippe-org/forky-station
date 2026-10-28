@@ -17,3 +17,8 @@
 #   id: GradientSunset
 #   kind: source
 #   path: "/Textures/_Qippe/Shaders/gradient_sunset.swsl"
+
+- type: shader
+  id: ChromaticAberration
+  kind: source
+  path: "/Textures/_Qippe/Shaders/chromatic_aberration.swsl"
