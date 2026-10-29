@@ -1,8 +1,10 @@
 using System.Collections.Frozen;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared._MACRO.Announcements;
 using Content.Shared._Qippe.QVars;
 using Content.Shared.ActionBlocker;
+using Content.Shared.CCVar;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Popups;
 using Content.Shared.Radio;
@@ -43,18 +45,21 @@ public abstract partial class SharedChatSystem : EntitySystem
     public static readonly ProtoId<AnnouncementSoundPrototype> DefaultAnnouncementSound = "Announce"; // Macrocosm edit - Announcement sound prototypes
 
     public static readonly ProtoId<RadioChannelPrototype> CommonChannel = "Common";
+    public bool ChatNameLinks { get; private set; }
 
     public static readonly string DefaultChannelPrefix = $"{RadioChannelPrefix}{DefaultChannelKey}";
     public static readonly ProtoId<SpeechVerbPrototype> DefaultSpeechVerb = "Default";
     public bool ForceCapitalize;
 
-    [Dependency] private SharedPopupSystem _popup = default!;
-    [Dependency] private EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private SharedAudioSystem _audio = default!;
-    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] protected IConfigurationManager Config = default!;
     [Dependency] private INetManager _net = default!;
     [Dependency] private IConfigurationManager _cfg = default!;
+    [Dependency] protected IRobustRandom Random = default!;
+    [Dependency] private ISharedPlayerManager _player = default!;
+    [Dependency] private ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
 
     /// <summary>
     /// Cache of the keycodes for faster lookup.
@@ -68,10 +73,12 @@ public abstract partial class SharedChatSystem : EntitySystem
         DebugTools.Assert(ProtoMan.HasIndex(CommonChannel));
 
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(OnPrototypeReload);
+        SubscribeAllEvent<ChatLinkClickedRequestEvent>(OnChatMessageLinkClicked);
         CacheRadios();
         CacheEmotes();
 
         Subs.CVar(_cfg, QVars.ForceCapitalize, value => ForceCapitalize = value, true);
+        Subs.CVar(Config, CCVars.ChatNameLinks, v => ChatNameLinks = v, true);
     }
 
     protected virtual void OnPrototypeReload(PrototypesReloadedEventArgs obj)
@@ -81,6 +88,20 @@ public abstract partial class SharedChatSystem : EntitySystem
 
         if (obj.WasModified<EmotePrototype>())
             CacheEmotes();
+    }
+
+    private void OnChatMessageLinkClicked(ChatLinkClickedRequestEvent msg, EntitySessionEventArgs args)
+    {
+        if (!ChatNameLinks)
+            return;
+
+        if (GetEntity(msg.Target) is not { Valid: true } target || !Exists(target))
+            return;
+
+        if (args.SenderSession.AttachedEntity is not { Valid: true } ent)
+            return;
+
+        ClickMessageSender(target, ent);
     }
 
     private void CacheRadios()
@@ -284,7 +305,10 @@ public abstract partial class SharedChatSystem : EntitySystem
         return trimmed;
     }
 
-    public static string InjectTagInsideTag(ChatMessage message, string outerTag, string innerTag, string? tagParameter)
+    /// <summary>
+    /// Injects a tag inside the first found instance of a specific <paramref name="outerTag"/> string in a <see cref="ChatMessage"/>.
+    /// </summary>
+    public static string InjectTagInsideTag(ChatMessage message, string outerTag, string innerTag, string? tagValue = null, params (string Key, string Value)[]? tagParameters)
     {
         var rawmsg = message.WrappedMessage;
         var tagStart = rawmsg.IndexOf($"[{outerTag}]");
@@ -293,9 +317,14 @@ public abstract partial class SharedChatSystem : EntitySystem
             return rawmsg;
         tagStart += outerTag.Length + 2;
 
-        string innerTagProcessed = tagParameter != null ? $"[{innerTag}={tagParameter}]" : $"[{innerTag}]";
-
         rawmsg = rawmsg.Insert(tagEnd, $"[/{innerTag}]");
+        if (tagValue != null)
+            innerTag = $"{innerTag}=\"{FormattedMessage.EscapeText(tagValue)}\"";
+
+        var innerTagProcessed = tagParameters == null
+            ? $"[{innerTag}]"
+            : $"[{innerTag} {string.Join(" ", tagParameters.Select(t => $"{FormattedMessage.EscapeText(t.Key)}=\"{FormattedMessage.RemoveMarkupPermissive(t.Value)}\""))}]";
+
         rawmsg = rawmsg.Insert(tagStart, innerTagProcessed);
 
         return rawmsg;
@@ -313,6 +342,62 @@ public abstract partial class SharedChatSystem : EntitySystem
         rawmsg = Regex.Replace(rawmsg, "(?i)(" + targetString + ")(?-i)(?![^[]*])", $"[{tag}={tagParameter}]$1[/{tag}]");
 #pragma warning restore RA0026
         return rawmsg;
+    }
+
+    /// <inheritdoc cref="CanClickMessageSender(EntityUid,EntityUid?)"/>
+    public bool CanClickMessageSender(NetEntity target, EntityUid? ent = null)
+    {
+        return CanClickMessageSender(GetEntity(target), ent);
+    }
+
+    /// <summary>
+    /// Checks whether an entity can click a chat message link.
+    /// </summary>
+    /// <param name="target">Target of the message link</param>
+    /// <param name="ent">Entity that is attempting to click the chat message, defaults to attached player entity if null.</param>
+    /// <returns>True if the entity is able to click the link</returns>
+    public bool CanClickMessageSender(EntityUid target, EntityUid? ent = null)
+    {
+        ent ??= _player.LocalEntity;
+        if (ent == null)
+            return false;
+
+        if (!CanClick(target, ent.Value))
+            return false;
+
+        var ev = new ClickEntityLinkEvent(target, true);
+        RaiseLocalEvent(ent.Value, ref ev);
+        return ev.Handled;
+    }
+
+    private bool CanClick(EntityUid target, EntityUid ent)
+    {
+        if (!ChatNameLinks)
+            return false;
+
+        if (ent == target)
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Teleports an entity to a target via <see cref="ClickEntityLinkEvent"/>
+    /// </summary>
+    /// <param name="target">Target we are attempted to teleport to</param>
+    /// <param name="ent">Entity that is attempting to warp</param>
+    /// <returns>True if warp was successful.</returns>
+    public void ClickMessageSender(EntityUid target, EntityUid? ent = null)
+    {
+        ent ??= _player.LocalEntity;
+        if (ent == null)
+            return;
+
+        if (!CanClick(target, ent.Value))
+            return;
+
+        var ev = new ClickEntityLinkEvent(target, false);
+        RaiseLocalEvent(ent.Value, ref ev);
     }
 
     public static string GetStringInsideTag(ChatMessage message, string tag)
