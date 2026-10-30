@@ -41,7 +41,7 @@
     fireStacks: 1
     count: 10
   - type: TimedDespawn
-    lifetime: 0.1
+    lifetime: 0.10
   - type: ParticleEmitter
     effect: GrenadeProjectile
 

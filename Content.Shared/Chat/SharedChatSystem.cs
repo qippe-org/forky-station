@@ -77,7 +77,7 @@ public abstract partial class SharedChatSystem : EntitySystem
         CacheRadios();
         CacheEmotes();
 
-        Subs.CVar(_cfg, QVars.ForceCapitalize, value => ForceCapitalize = value, true);
+        Subs.CVar(_cfg, QVars.ForceCapitalize, v => ForceCapitalize = v, true);
         Subs.CVar(Config, CCVars.ChatNameLinks, v => ChatNameLinks = v, true);
     }
 

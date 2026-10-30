@@ -1214,6 +1214,13 @@
   - message: Adjusted artifact trigger weights
     type: Tweak
   id: 143
-  time: '2026-10-29T10:41:29Z'
-  url: https://github.com/funky-station/forky-station/pull/566
+  time: '2026-10-30T02:55:06Z'
+  url: https://github.com/funky-station/forky-station/pull/592
+- author: mkanke
+  changes:
+  - message: Emotional Support Crowbar added to maints loot pool
+    type: Add
+  id: 144
+  time: '2026-10-30T19:51:03Z'
+  url: https://github.com/funky-station/forky-station/pull/274
 Order: -1
