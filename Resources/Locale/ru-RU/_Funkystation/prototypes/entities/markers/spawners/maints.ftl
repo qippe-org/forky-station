@@ -25,3 +25,5 @@ ent-RandomToolboxSpawner50 =  спавнер случайный ящик для 
 ent-RandomToolboxSpawner = спавнер случайный ящик для инструментов
     .suffix = 100
     .desc = { ent-MarkerBase.desc }
+ent-RandomCrowbarSpawner = спавнер случайная монтировка
+    .desc = { ent-MarkerBase.desc }
