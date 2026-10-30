@@ -53,7 +53,6 @@ public abstract partial class SharedChatSystem : EntitySystem
 
     [Dependency] protected IConfigurationManager Config = default!;
     [Dependency] private INetManager _net = default!;
-    [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] protected IRobustRandom Random = default!;
     [Dependency] private ISharedPlayerManager _player = default!;
     [Dependency] private ActionBlockerSystem _actionBlocker = default!;
@@ -77,7 +76,7 @@ public abstract partial class SharedChatSystem : EntitySystem
         CacheRadios();
         CacheEmotes();
 
-        Subs.CVar(_cfg, QVars.ForceCapitalize, v => ForceCapitalize = v, true);
+        Subs.CVar(Config, QVars.ForceCapitalize, v => ForceCapitalize = v, true);
         Subs.CVar(Config, CCVars.ChatNameLinks, v => ChatNameLinks = v, true);
     }
 
