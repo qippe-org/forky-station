@@ -92,3 +92,6 @@ entity-condition-guidebook-internals =
         [true] использует баллон
         *[false] дышит атмосферой
     }
+
+entity-condition-guidebook-mouth-uncovered-condition =
+    у цели открытый рот
