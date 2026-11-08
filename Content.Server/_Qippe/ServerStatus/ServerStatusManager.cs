@@ -16,6 +16,10 @@ public sealed partial class ServerStatusManager : IPostInjectInit
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IServerDbManager _db = default!;
 
+    private const string PlayerListPath = "/playerlist";
+    private const string BanNotePath = "/bannote";
+    private const string PlayerPath = "/player";
+
     void IPostInjectInit.PostInject()
     {
     }
@@ -29,7 +33,7 @@ public sealed partial class ServerStatusManager : IPostInjectInit
 
     private async Task<bool> HandlePlayerList(IStatusHandlerContext statusHandlerContext)
     {
-        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath != "/playerlist")
+        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath is not PlayerListPath)
             return false;
 
         var enabled = _cfg.GetCVar(QVars.StatusPlayerList);
@@ -57,7 +61,7 @@ public sealed partial class ServerStatusManager : IPostInjectInit
 
     private async Task<bool> HandlePlayerRecord(IStatusHandlerContext statusHandlerContext)
     {
-        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath != "/player")
+        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath is not PlayerPath)
             return false;
 
         var enabled = _cfg.GetCVar(QVars.StatusPlayerRecord);
@@ -86,7 +90,7 @@ public sealed partial class ServerStatusManager : IPostInjectInit
 
     private async Task<bool> HandleBanNote(IStatusHandlerContext statusHandlerContext)
     {
-        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath is not "/bannote")
+        if (!statusHandlerContext.IsGetLike || statusHandlerContext.Url.AbsolutePath is not BanNotePath)
             return false;
 
         var enabled = _cfg.GetCVar(QVars.StatusBanNote);
