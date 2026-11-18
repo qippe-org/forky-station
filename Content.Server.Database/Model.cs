@@ -29,6 +29,7 @@ namespace Content.Server.Database
         public DbSet<AdminLog> AdminLog { get; set; } = null!;
         public DbSet<AdminLogPlayer> AdminLogPlayer { get; set; } = null!;
         public DbSet<Whitelist> Whitelist { get; set; } = null!;
+        public DbSet<WhitelistApplication> WhitelistApplications { get; set; } = null!;
         public DbSet<Blacklist> Blacklist { get; set; } = null!;
         public DbSet<Ban> Ban { get; set; } = default!;
         public DbSet<BanRound> BanRound { get; set; } = default!;
@@ -275,6 +276,24 @@ namespace Content.Server.Database
                 .HasForeignKey(w => w.PlayerUserId)
                 .HasPrincipalKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WhitelistApplication>()
+                .HasIndex(a => a.PlayerUserId)
+                .IsUnique();
+
+            modelBuilder.Entity<WhitelistApplication>()
+                .HasOne(a => a.Player)
+                .WithOne(p => p.WhitelistApplication)
+                .HasForeignKey<WhitelistApplication>(a => a.PlayerUserId)
+                .HasPrincipalKey<Player>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WhitelistApplication>()
+                .HasOne(a => a.ReviewedBy)
+                .WithMany(p => p.ReviewedWhitelistApplications)
+                .HasForeignKey(a => a.ReviewedById)
+                .HasPrincipalKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Changes for modern HWID integration
             modelBuilder.Entity<Player>()
@@ -523,12 +542,46 @@ namespace Content.Server.Database
         public List<Ban> AdminServerBansCreated { get; set; } = null!;
         public List<Ban> AdminServerBansLastEdited { get; set; } = null!;
         public List<RoleWhitelist> JobWhitelists { get; set; } = null!;
+        public WhitelistApplication? WhitelistApplication { get; set; }
+        public List<WhitelistApplication> ReviewedWhitelistApplications { get; set; } = null!;
     }
 
     [Table("whitelist")]
     public class Whitelist
     {
         [Required, Key] public Guid UserId { get; set; }
+    }
+
+    public enum WhitelistApplicationStatus
+    {
+        Pending = 0,
+        Approved = 1,
+        Denied = 2,
+    }
+
+    public class WhitelistApplication
+    {
+        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required, ForeignKey(nameof(Player))]
+        public Guid PlayerUserId { get; set; }
+        public Player Player { get; set; } = default!;
+
+        [Required, MaxLength(4096)]
+        public string Message { get; set; } = string.Empty;
+
+        [Required]
+        public WhitelistApplicationStatus Status { get; set; } = WhitelistApplicationStatus.Pending;
+
+        [Required]
+        public DateTime CreatedAt { get; set; }
+
+        [ForeignKey(nameof(ReviewedBy))]
+        public Guid? ReviewedById { get; set; }
+        public Player? ReviewedBy { get; set; }
+
+        public DateTime? ReviewedAt { get; set; }
     }
 
     /// <summary>

@@ -230,6 +230,14 @@ namespace Content.Server.Database
 
         Task RemoveFromWhitelistAsync(NetUserId player);
 
+        Task<WhitelistApplication> AddWhitelistApplicationAsync(NetUserId player, string message);
+
+        Task<WhitelistApplication?> GetWhitelistApplicationByPlayerAsync(NetUserId player);
+
+        Task<List<WhitelistApplication>> GetAllWhitelistApplicationsAsync();
+
+        Task<WhitelistApplication?> SetWhitelistApplicationStatusAsync(int id, WhitelistApplicationStatus status, Guid? reviewedBy);
+
         #endregion
 
         #region Blacklist
@@ -783,6 +791,30 @@ namespace Content.Server.Database
         {
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.RemoveFromWhitelistAsync(player));
+        }
+
+        public Task<WhitelistApplication> AddWhitelistApplicationAsync(NetUserId player, string message)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.AddWhitelistApplicationAsync(player, message));
+        }
+
+        public Task<WhitelistApplication?> GetWhitelistApplicationByPlayerAsync(NetUserId player)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetWhitelistApplicationByPlayerAsync(player));
+        }
+
+        public Task<List<WhitelistApplication>> GetAllWhitelistApplicationsAsync()
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAllWhitelistApplicationsAsync());
+        }
+
+        public Task<WhitelistApplication?> SetWhitelistApplicationStatusAsync(int id, WhitelistApplicationStatus status, Guid? reviewedBy)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.SetWhitelistApplicationStatusAsync(id, status, reviewedBy));
         }
 
         public Task<bool> GetBlacklistStatusAsync(NetUserId player)

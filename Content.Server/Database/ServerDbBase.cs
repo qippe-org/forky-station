@@ -1028,6 +1028,63 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
             await db.DbContext.SaveChangesAsync();
         }
 
+        public async Task<WhitelistApplication> AddWhitelistApplicationAsync(NetUserId player, string message)
+        {
+            await using var db = await GetDb();
+
+            var application = new WhitelistApplication
+            {
+                PlayerUserId = player,
+                Message = message,
+                Status = WhitelistApplicationStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            db.DbContext.WhitelistApplications.Add(application);
+            await db.DbContext.SaveChangesAsync();
+            return application;
+        }
+
+        public async Task<WhitelistApplication?> GetWhitelistApplicationByPlayerAsync(NetUserId player)
+        {
+            await using var db = await GetDb();
+
+            return await db.DbContext.WhitelistApplications
+                .Include(application => application.Player)
+                .Include(application => application.ReviewedBy)
+                .SingleOrDefaultAsync(application => application.PlayerUserId == player);
+        }
+
+        public async Task<List<WhitelistApplication>> GetAllWhitelistApplicationsAsync()
+        {
+            await using var db = await GetDb();
+
+            return await db.DbContext.WhitelistApplications
+                .Include(application => application.Player)
+                .Include(application => application.ReviewedBy)
+                .OrderBy(application => application.Id)
+                .ToListAsync();
+        }
+
+        public async Task<WhitelistApplication?> SetWhitelistApplicationStatusAsync(int id, WhitelistApplicationStatus status, Guid? reviewedBy)
+        {
+            await using var db = await GetDb();
+
+            var application = await db.DbContext.WhitelistApplications
+                .Include(application => application.Player)
+                .Include(application => application.ReviewedBy)
+                .SingleOrDefaultAsync(application => application.Id == id);
+
+            if (application == null)
+                return null;
+
+            application.Status = status;
+            application.ReviewedById = reviewedBy;
+            application.ReviewedAt = DateTime.UtcNow;
+            await db.DbContext.SaveChangesAsync();
+            return application;
+        }
+
         public async Task<DateTimeOffset?> GetLastReadRules(NetUserId player)
         {
             await using var db = await GetDb();
