@@ -1,4 +1,5 @@
 admin-player-actions-window-ban = Banning panel
+admin-player-actions-window-whitelist-applications = Whitelist applications
 admin-player-actions-window-admin-ghost = Admin Ghost
 admin-player-actions-window-permissions = Permissions Panel
 admin-player-actions-window-announce = Announce

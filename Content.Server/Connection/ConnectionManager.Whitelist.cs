@@ -20,6 +20,15 @@ public sealed partial class ConnectionManager
     private void InitializeWhitelist()
     {
         _cfg.OnValueChanged(CCVars.WhitelistPrototypeList, UpdateWhitelists, true);
+        _cfg.OnValueChanged(CCVars.WhitelistEnabled, OnWhitelistEnabledChanged);
+    }
+
+    private void OnWhitelistEnabledChanged(bool enabled)
+    {
+        // Turning the whitelist off must not leave anyone stuck on the application screen, since there is no longer
+        // anything for them to apply for.
+        if (!enabled)
+            _whitelistGate.ReleaseAll();
     }
 
     private void UpdateWhitelists(string s)

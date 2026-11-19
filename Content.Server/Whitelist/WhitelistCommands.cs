@@ -7,6 +7,7 @@ using Robust.Server.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Console;
 using Robust.Shared.Network;
+using WhitelistGateManager = Content.Server._Qippe.Whitelist.WhitelistGateManager;
 
 namespace Content.Server.Whitelist;
 
@@ -16,6 +17,7 @@ public sealed partial class AddWhitelistCommand : LocalizedCommands
     [Dependency] private IPlayerLocator _locator = default!;
     [Dependency] private IServerDbManager _dbManager = default!;
     [Dependency] private WhitelistManager _whitelistManager = default!;
+    [Dependency] private WhitelistGateManager _whitelistGate = default!;
     public override string Command => "whitelistadd";
 
     public override async void Execute(IConsoleShell shell, string argStr, string[] args)
@@ -41,6 +43,9 @@ public sealed partial class AddWhitelistCommand : LocalizedCommands
 
             _whitelistManager.AddWhitelist(guid);
             shell.WriteLine(Loc.GetString("cmd-whitelistadd-added", ("username", data.Username)));
+
+            // The player may already be connected and sitting on the application screen.
+            _whitelistGate.Release(guid);
             return;
         }
 

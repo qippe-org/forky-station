@@ -1,0 +1,12 @@
+<Popup xmlns="https://spacestation14.io">
+    <PanelContainer StyleClasses="BackgroundDark">
+        <BoxContainer Orientation="Vertical" Margin="4" MinWidth="400">
+            <Label Name="HeaderLabel" StyleClasses="LabelHeading" HorizontalExpand="True" />
+            <Label Name="DetailsLabel" HorizontalExpand="True" />
+            <Label Text="{Loc whitelist-application-popup-message}" />
+            <ScrollContainer MinHeight="120" MaxHeight="300" HScrollEnabled="False">
+                <RichTextLabel Name="MessageLabel" HorizontalExpand="True" />
+            </ScrollContainer>
+        </BoxContainer>
+    </PanelContainer>
+</Popup>

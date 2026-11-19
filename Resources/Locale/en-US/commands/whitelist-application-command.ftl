@@ -1,12 +1,12 @@
 cmd-whitelistapply-desc = Submits a whitelist application for this server. You can only apply once.
-cmd-whitelistapply-help = Usage: whitelistapply <message>
+cmd-whitelistapply-help = Usage: whitelistapply [message]. Run without arguments to open the application form.
 cmd-whitelistapply-message-missing = You need to write a message for your application.
 cmd-whitelistapply-message-too-long = Your application is too long. The maximum is {$max} characters.
 cmd-whitelistapply-created = Whitelist application #{$id} submitted. An admin will review it soon.
 cmd-whitelistapply-already-applied = You have already submitted a whitelist application.
 cmd-whitelistapply-failed = Your whitelist application could not be submitted.
 
-cmd-whitelistapplications-desc = Lists every whitelist application.
+cmd-whitelistapplications-desc = Lists every whitelist application, or opens the review window when run by an admin in game.
 cmd-whitelistapplications-help = Usage: whitelistapplications
 cmd-whitelistapplications-empty = There are no whitelist applications.
 cmd-whitelistapplications-entry = #{$id} | {$player} | {$status} | {$createdAt} | {$message}

@@ -164,6 +164,10 @@ namespace Content.Server.GameTicking
             if (DummyTicker)
                 return;
 
+            // Defence in depth: a gated player must never reach the round, whatever path got us here.
+            if (_whitelistGate.IsGated(player.UserId))
+                return;
+
             if (station == EntityUid.Invalid)
             {
                 var stations = GetSpawnableStations();
@@ -363,6 +367,9 @@ namespace Content.Server.GameTicking
 
         public void Respawn(ICommonSession player)
         {
+            if (_whitelistGate.IsGated(player.UserId))
+                return;
+
             _mind.WipeMind(player);
             _adminLogger.Add(LogType.Respawn, LogImpact.Medium, $"Player {player} was respawned.");
 
@@ -381,6 +388,9 @@ namespace Content.Server.GameTicking
         /// <param name="silent">Whether or not the player should be greeted upon joining</param>
         public void MakeJoinGame(ICommonSession player, EntityUid station, string? jobId = null, bool silent = false)
         {
+            if (_whitelistGate.IsGated(player.UserId))
+                return;
+
             if (!_playerGameStatuses.ContainsKey(player.UserId))
                 return;
 
@@ -398,6 +408,12 @@ namespace Content.Server.GameTicking
             // Can't spawn players with a dummy ticker!
             if (DummyTicker)
                 return;
+
+            if (_whitelistGate.IsGated(player.UserId))
+            {
+                EnterWhitelistApplication(player);
+                return;
+            }
 
             PlayerJoinGame(player);
             SpawnObserver(player);

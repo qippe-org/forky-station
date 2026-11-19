@@ -1,0 +1,24 @@
+<BoxContainer
+    xmlns="https://spacestation14.io"
+    Orientation="Horizontal"
+    HorizontalExpand="True"
+    SeparationOverride="4">
+    <Label Text="{Loc whitelist-application-header-id}"
+           SizeFlagsStretchRatio="1"
+           HorizontalExpand="True" />
+    <Label Text="{Loc whitelist-application-header-player}"
+           SizeFlagsStretchRatio="3"
+           HorizontalExpand="True" />
+    <Label Text="{Loc whitelist-application-header-status}"
+           SizeFlagsStretchRatio="2"
+           HorizontalExpand="True" />
+    <Label Text="{Loc whitelist-application-header-created}"
+           SizeFlagsStretchRatio="3"
+           HorizontalExpand="True" />
+    <Label Text="{Loc whitelist-application-header-reviewer}"
+           SizeFlagsStretchRatio="3"
+           HorizontalExpand="True" />
+    <Label Text="{Loc whitelist-application-header-actions}"
+           SizeFlagsStretchRatio="6"
+           HorizontalExpand="True" />
+</BoxContainer>

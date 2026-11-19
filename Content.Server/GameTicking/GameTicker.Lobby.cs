@@ -162,6 +162,10 @@ namespace Content.Server.GameTicking
 
         public void ToggleReady(ICommonSession player, bool ready)
         {
+            // A gated player is not in the lobby, so they must not be able to ready up.
+            if (_whitelistGate.IsGated(player.UserId))
+                return;
+
             if (!_playerGameStatuses.ContainsKey(player.UserId))
                 return;
 

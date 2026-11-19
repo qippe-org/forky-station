@@ -1,0 +1,35 @@
+<ui:WhitelistApplicationScreen
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._Qippe.Whitelist.UI"
+    xmlns:parallax="clr-namespace:Content.Client.Parallax">
+    <parallax:ParallaxControl Name="Background" Access="Public" SpeedX="5" SpeedY="20" />
+    <PanelContainer Name="MainPanel" Access="Public"
+                    StyleClasses="BackgroundPanel"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+        <BoxContainer Orientation="Vertical"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center"
+                      SeparationOverride="10"
+                      MaxWidth="620"
+                      Margin="24">
+            <Label Name="TitleLabel" Access="Public"
+                   StyleClasses="LabelHeadingBigger"
+                   HorizontalAlignment="Center" />
+            <RichTextLabel Name="DescriptionLabel" Access="Public"
+                           HorizontalExpand="True" />
+            <Label Name="StatusLabel" Access="Public"
+                   HorizontalExpand="True"
+                   Visible="False" />
+            <BoxContainer Orientation="Horizontal"
+                          HorizontalAlignment="Center"
+                          SeparationOverride="8">
+                <Button Name="ApplyButton" Access="Public"
+                        StyleClasses="ButtonBig"
+                        Text="{Loc whitelist-application-screen-open}" />
+                <Button Name="DisconnectButton" Access="Public"
+                        Text="{Loc whitelist-application-screen-disconnect}" />
+            </BoxContainer>
+        </BoxContainer>
+    </PanelContainer>
+</ui:WhitelistApplicationScreen>

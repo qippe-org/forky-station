@@ -8,7 +8,9 @@ using Content.Server.Connection.IPIntel;
 using Content.Server.Database;
 using Content.Server.GameTicking;
 using Content.Server.Preferences.Managers;
+using Content.Server._Qippe.Whitelist;
 using Content.Shared.CCVar;
+using Content.Shared.Database;
 using Content.Shared.GameTicking;
 using Content.Shared.Players.PlayTimeTracking;
 using Robust.Server.Player;
@@ -63,6 +65,7 @@ namespace Content.Server.Connection
         [Dependency] private IHttpClientHolder _http = default!;
         [Dependency] private IAdminManager _adminManager = default!;
         [Dependency] private IEntityManager _entityManager = default!;
+        [Dependency] private WhitelistGateManager _whitelistGate = default!;
 
         private GameTicker? _ticker;
 
@@ -329,8 +332,21 @@ namespace Content.Server.Connection
                     var whitelistStatus = await IsWhitelisted(whitelist, e.UserData, _sawmill);
                     if (!whitelistStatus.isWhitelisted)
                     {
-                        // Not whitelisted.
-                        return (ConnectionDenyReason.Whitelist, Loc.GetString("whitelist-fail-prefix", ("msg", whitelistStatus.denyMessage!)), null);
+                        // Not whitelisted. A blacklist entry is a hard block, so it must never be downgraded to the
+                        // application gate, otherwise this change would hand blacklisted players a way in.
+                        if (await _db.GetBlacklistStatusAsync(userId))
+                            return (ConnectionDenyReason.Whitelist, Loc.GetString("whitelist-fail-prefix", ("msg", whitelistStatus.denyMessage!)), null);
+
+                        // A denied applicant stays out entirely. Denial is meant to be final, and re-applying would
+                        // turn every denial into an endless retry loop for the reviewing admins.
+                        var application = await _db.GetWhitelistApplicationByPlayerAsync(userId);
+                        if (application?.Status == WhitelistApplicationStatus.Denied)
+                            return (ConnectionDenyReason.Whitelist, Loc.GetString("whitelist-application-denied"), null);
+
+                        // Everyone else connects, but only to fill in the application form. GameTicker keeps them
+                        // out of the lobby and the round until an admin approves them.
+                        _whitelistGate.Gate(userId);
+                        break;
                     }
 
                     // Whitelisted, don't check any more.

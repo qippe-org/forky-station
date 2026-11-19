@@ -1,7 +1,10 @@
 using Content.Client.Administration.Managers;
 using Content.Client.Gameplay;
 using Content.Client.Lobby;
+using Content.Client._Qippe.Whitelist;
+using Content.Client._Qippe.Whitelist.UI;
 using Content.Client.RoundEnd;
+using Content.Shared._Qippe.Whitelist;
 using Content.Shared.GameTicking;
 using Content.Shared.GameWindow;
 using Content.Shared.Roles;
@@ -36,6 +39,11 @@ namespace Content.Client.GameTicking.Managers
         [ViewVariables] public TimeSpan StartTime { get; private set; }
         [ViewVariables] public new bool Paused { get; private set; }
 
+        /// <summary>
+        /// True when the whitelist is blocking us but we may still apply, and we already have an application on file.
+        /// </summary>
+        [ViewVariables] public bool HasWhitelistApplication { get; private set; }
+
         public override IReadOnlyList<(TimeSpan, string)> AllPreviousGameRules => new List<(TimeSpan, string)>();
 
         [ViewVariables] public IReadOnlyDictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> JobsAvailable => _jobsAvailable;
@@ -52,6 +60,7 @@ namespace Content.Client.GameTicking.Managers
             base.Initialize();
 
             SubscribeNetworkEvent<TickerJoinLobbyEvent>(JoinLobby);
+            SubscribeNetworkEvent<TickerJoinWhitelistApplicationEvent>(JoinWhitelistApplication);
             SubscribeNetworkEvent<TickerJoinGameEvent>(JoinGame);
             SubscribeNetworkEvent<TickerConnectionStatusEvent>(ConnectionStatus);
             SubscribeNetworkEvent<TickerLobbyStatusEvent>(LobbyStatus);
@@ -120,6 +129,18 @@ namespace Content.Client.GameTicking.Managers
         private void JoinLobby(TickerJoinLobbyEvent message)
         {
             _stateManager.RequestStateChange<LobbyState>();
+        }
+
+        private void JoinWhitelistApplication(TickerJoinWhitelistApplicationEvent message)
+        {
+            HasWhitelistApplication = message.HasApplication;
+
+            // RequestStateChange is a no-op when this state is already active, so push the new state to the live screen
+            // as well. This is what updates the screen after the player submits their application.
+            _stateManager.RequestStateChange<WhitelistApplicationState>();
+
+            if (_userInterfaceManager.ActiveScreen is WhitelistApplicationScreen screen)
+                screen.SetState(HasWhitelistApplication);
         }
 
         private void ConnectionStatus(TickerConnectionStatusEvent message)

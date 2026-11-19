@@ -1,4 +1,5 @@
 using Content.Server.Administration;
+using Content.Shared._Qippe.Whitelist;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
@@ -10,6 +11,7 @@ using JetBrains.Annotations;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
 using Robust.Shared.Enums;
+using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
@@ -105,6 +107,14 @@ namespace Content.Server.GameTicking
                 case SessionStatus.InGame:
                     {
                         _userDb.ClientConnected(session);
+
+                        // A player the whitelist is blocking may only use the application form. Sending them to the
+                        // lobby here is what would otherwise let them ready up and reach the round.
+                        if (_whitelistGate.IsGated(session.UserId))
+                        {
+                            EnterWhitelistApplication(session);
+                            break;
+                        }
 
                         if (mind == null)
                         {
@@ -228,10 +238,91 @@ namespace Content.Server.GameTicking
             RaiseNetworkEvent(new TickerJoinGameEvent(), session.Channel);
         }
 
+        /// <summary>
+        /// Sends a player the whitelist application screen instead of the lobby.
+        /// </summary>
+        /// <remarks>
+        /// No game status is recorded, so the player never counts towards the ready count and is never eligible to be
+        /// spawned when the round starts.
+        /// </remarks>
+        private async void EnterWhitelistApplication(ICommonSession session)
+        {
+            var hasApplication = await _whitelistGate.HasApplicationAsync(session.UserId);
+
+            // The player may have disconnected while the query was running.
+            if (!_playerManager.TryGetSessionById(session.UserId, out var current) || current != session)
+                return;
+
+            RaiseNetworkEvent(new TickerJoinWhitelistApplicationEvent(hasApplication), session.Channel);
+        }
+
+        /// <summary>
+        /// Spawns a player once their database load finishes, the same way the normal join path does.
+        /// </summary>
+        private async void SpawnWaitDbForSession(ICommonSession session)
+        {
+            try
+            {
+                await _userDb.WaitLoadComplete(session);
+            }
+            catch (OperationCanceledException)
+            {
+                // The player disconnected or the round restarted.
+                return;
+            }
+
+            SpawnPlayer(session, EntityUid.Invalid);
+        }
+
+        /// <summary>
+        /// Puts a player whose whitelist gate was just lifted back on the normal join path.
+        /// </summary>
+        public void SendToLobbyAfterWhitelist(NetUserId player)
+        {
+            if (!_playerManager.TryGetSessionById(player, out var session))
+                return;
+
+            // They never got a game status while gated, so this is their first real entry into the round flow.
+            if (LobbyEnabled)
+            {
+                PlayerJoinLobby(session);
+            }
+            else
+            {
+                _playerGameStatuses[session.UserId] = PlayerGameStatus.JoinedGame;
+                SpawnWaitDbForSession(session);
+            }
+        }
+
+        /// <summary>
+        /// Re-sends the application screen state to a gated player, so the screen stops offering the form once they
+        /// have submitted an application.
+        /// </summary>
+        public void RefreshWhitelistApplicationScreen(NetUserId player)
+        {
+            if (!_whitelistGate.IsGated(player))
+                return;
+
+            if (!_playerManager.TryGetSessionById(player, out var session))
+                return;
+
+            EnterWhitelistApplication(session);
+        }
+
         private void PlayerJoinLobby(ICommonSession session)
         {
+            if (_whitelistGate.IsGated(session.UserId))
+            {
+                EnterWhitelistApplication(session);
+                return;
+            }
+
             _playerGameStatuses[session.UserId] = LobbyEnabled ? PlayerGameStatus.NotReadyToPlay : PlayerGameStatus.ReadyToPlay;
-            _db.AddRoundPlayers(RoundId, session.UserId);
+
+            // Before the first round starts there is no round row to record players against, and inserting one
+            // against round 0 violates the foreign key. AddPlayerToDb guards the same way.
+            if (RoundId != 0)
+                _db.AddRoundPlayers(RoundId, session.UserId);
 
             var client = session.Channel;
             RaiseNetworkEvent(new TickerJoinLobbyEvent(), client);

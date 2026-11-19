@@ -552,13 +552,6 @@ namespace Content.Server.Database
         [Required, Key] public Guid UserId { get; set; }
     }
 
-    public enum WhitelistApplicationStatus
-    {
-        Pending = 0,
-        Approved = 1,
-        Denied = 2,
-    }
-
     public class WhitelistApplication
     {
         [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

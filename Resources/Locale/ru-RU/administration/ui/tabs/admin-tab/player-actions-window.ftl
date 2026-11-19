@@ -1,4 +1,5 @@
 admin-player-actions-window-ban = Панель банов
+admin-player-actions-window-whitelist-applications = Заявки в вайтлист
 admin-player-actions-window-admin-ghost = Админ призрак
 admin-player-actions-window-permissions = Панель доступов
 admin-player-actions-window-announce = Сделать объявление

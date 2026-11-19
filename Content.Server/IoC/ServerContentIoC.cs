@@ -36,6 +36,7 @@ using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Players.RateLimiting;
 using Content.Server._Qippe.ServerStatus;
 using QippeWhitelistManager = Content.Server._Qippe.Whitelist.WhitelistManager;
+using WhitelistGateManager = Content.Server._Qippe.Whitelist.WhitelistGateManager;
 
 namespace Content.Server.IoC;
 
@@ -92,6 +93,7 @@ internal static class ServerContentIoC
         deps.Register<AnnouncerManager>(); // Macrocosm edit
         deps.Register<WhitelistManager>();
         deps.Register<QippeWhitelistManager>();
+        deps.Register<WhitelistGateManager>();
         deps.Register<ServerStatusManager>();
     }
 }

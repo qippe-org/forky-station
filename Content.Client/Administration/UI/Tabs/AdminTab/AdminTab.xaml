@@ -8,6 +8,7 @@
     <BoxContainer Orientation="Vertical">
         <GridContainer Columns="3">
             <cc:CommandButton Command="banpanel" Text="{Loc admin-player-actions-window-ban}" />
+            <cc:CommandButton Command="whitelistapplications" Text="{Loc admin-player-actions-window-whitelist-applications}" />
             <cc:CommandButton Command="aghost" Text="{Loc admin-player-actions-window-admin-ghost}" />
             <cc:CommandButton Command="permissions" Text="{Loc admin-player-actions-window-permissions}" />
             <cc:CommandButton Command="announceui" Text="{Loc admin-player-actions-window-announce}"/>

@@ -1,0 +1,18 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      Title="{Loc whitelist-application-form-title}"
+                      MinSize="420 300"
+                      SetSize="560 420">
+    <BoxContainer Orientation="Vertical" Margin="4" SeparationOverride="4">
+        <Label Name="DescriptionLabel" Access="Public" HorizontalExpand="True" />
+        <RichTextLabel Name="StatusLabel" Access="Public" HorizontalExpand="True" Visible="False" />
+        <Label Name="ReviewerLabel" Access="Public" HorizontalExpand="True" Visible="False" />
+        <TextEdit Name="MessageEdit" Access="Public"
+                  MinHeight="120"
+                  HorizontalExpand="True"
+                  VerticalExpand="True" />
+        <Label Name="CounterLabel" Access="Public" HorizontalExpand="True" />
+        <Button Name="SubmitButton" Access="Public" Text="{Loc whitelist-application-submit}" />
+    </BoxContainer>
+</controls:FancyWindow>
+

@@ -1,12 +1,12 @@
 cmd-whitelistapply-desc = Отправляет заявку в вайтлист сервера. Заявку можно отправить только один раз.
-cmd-whitelistapply-help = Использование: whitelistapply <сообщение>
+cmd-whitelistapply-help = Использование: whitelistapply [сообщение]. Без аргументов открывает форму заявки.
 cmd-whitelistapply-message-missing = Вам нужно написать сообщение для заявки.
 cmd-whitelistapply-message-too-long = Заявка слишком длинная. Максимум: { $max } символов.
 cmd-whitelistapply-created = Заявка в вайтлист #{ $id } отправлена. Администратор скоро её рассмотрит.
 cmd-whitelistapply-already-applied = Вы уже отправили заявку в вайтлист.
 cmd-whitelistapply-failed = Не удалось отправить заявку в вайтлист.
 
-cmd-whitelistapplications-desc = Показывает все заявки в вайтлист.
+cmd-whitelistapplications-desc = Показывает все заявки в вайтлист. При запуске администратором в игре открывает окно рассмотрения.
 cmd-whitelistapplications-help = Использование: whitelistapplications
 cmd-whitelistapplications-empty = Заявок в вайтлист нет.
 cmd-whitelistapplications-entry = #{ $id } | { $player } | { $status } | { $createdAt } | { $message }

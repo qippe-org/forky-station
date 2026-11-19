@@ -1,0 +1,12 @@
+<controls:WhitelistApplicationsWindow
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Qippe.Whitelist"
+    SetSize="1000 500"
+    Title="Whitelist applications">
+    <TabContainer Name="Tabs" Access="Public">
+        <controls:WhitelistApplicationListControl Name="AllList" Access="Public" />
+        <controls:WhitelistApplicationListControl Name="PendingList" Access="Public" />
+        <controls:WhitelistApplicationListControl Name="ApprovedList" Access="Public" />
+        <controls:WhitelistApplicationListControl Name="DeniedList" Access="Public" />
+    </TabContainer>
+</controls:WhitelistApplicationsWindow>

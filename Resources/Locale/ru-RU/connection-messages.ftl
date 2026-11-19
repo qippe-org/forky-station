@@ -38,6 +38,7 @@ whitelist-manual = Вы отсутствуете в белом списке эт
 whitelist-blacklisted = Вы находитесь в чёрном списке этого сервера.
 whitelist-always-deny = Вам запрещено присоединяться к этому серверу.
 whitelist-fail-prefix = Не внесён в белый список: { $msg }
+whitelist-application-denied = Ваша заявка в вайтлист была отклонена, поэтому вы не можете присоединиться к этому серверу.
 
 cmd-blacklistadd-desc = Добавить игрока в чёрный список сервера.
 cmd-blacklistadd-help = Использование: blacklistadd <username>

@@ -1,6 +1,8 @@
 using Content.Server.Administration;
 using Content.Server.Database;
+using Content.Server.EUI;
 using Content.Shared.Administration;
+using Content.Shared.Database;
 using Robust.Shared.Console;
 
 namespace Content.Server._Qippe.Whitelist;
@@ -12,6 +14,7 @@ namespace Content.Server._Qippe.Whitelist;
 public sealed partial class WhitelistApplyCommand : LocalizedCommands
 {
     [Dependency] private WhitelistManager _whitelist = default!;
+    [Dependency] private EuiManager _euis = default!;
 
     public override string Command => "whitelistapply";
 
@@ -25,8 +28,7 @@ public sealed partial class WhitelistApplyCommand : LocalizedCommands
 
         if (args.Length == 0)
         {
-            shell.WriteError(Loc.GetString("cmd-whitelistapply-message-missing"));
-            shell.WriteLine(Help);
+            _euis.OpenEui(new WhitelistApplyEui(), player);
             return;
         }
 
@@ -62,6 +64,7 @@ public sealed partial class WhitelistApplyCommand : LocalizedCommands
 public sealed partial class WhitelistApplicationsCommand : LocalizedCommands
 {
     [Dependency] private WhitelistManager _whitelist = default!;
+    [Dependency] private EuiManager _euis = default!;
 
     public override string Command => "whitelistapplications";
 
@@ -73,6 +76,13 @@ public sealed partial class WhitelistApplicationsCommand : LocalizedCommands
                 ("properAmount", 0),
                 ("currentAmount", args.Length)));
             shell.WriteLine(Help);
+            return;
+        }
+
+        // A player gets the review window, the server console and RCON keep the text listing.
+        if (shell.Player is { } player)
+        {
+            _euis.OpenEui(new WhitelistApplicationsEui(), player);
             return;
         }
 
