@@ -57,12 +57,7 @@ public sealed partial class WhitelistApplicationWebhook : IPostInjectInit
     void IPostInjectInit.PostInject()
     {
         _sawmill = _log.GetSawmill("whitelist_application");
-        _cfg.OnValueChanged(CCVars.DiscordWhitelistApplicationWebhook, SetWebhookUrl, true);
-    }
-
-    private void SetWebhookUrl(string url)
-    {
-        _webhookUrl = url;
+        _cfg.OnValueChanged(CCVars.DiscordWhitelistApplicationWebhook, value => _webhookUrl = value, true);
     }
 
     /// <summary>
