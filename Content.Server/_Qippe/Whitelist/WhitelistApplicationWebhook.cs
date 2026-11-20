@@ -57,7 +57,24 @@ public sealed partial class WhitelistApplicationWebhook : IPostInjectInit
     void IPostInjectInit.PostInject()
     {
         _sawmill = _log.GetSawmill("whitelist_application");
-        _cfg.OnValueChanged(CCVars.DiscordWhitelistApplicationWebhook, value => _webhookUrl = value, true);
+    }
+
+    /// <summary>
+    /// Subscribes to the webhook cvar.
+    /// </summary>
+    /// <remarks>
+    /// This cannot happen in <see cref="IPostInjectInit.PostInject"/>: dependencies are injected (and post-injected)
+    /// while the IoC graph is being built, which is before the configuration manager has loaded any cvar definitions.
+    /// Subscribing there throws a <see cref="KeyNotFoundException"/> for the not-yet-registered cvar.
+    /// </remarks>
+    public void Initialize()
+    {
+        _cfg.OnValueChanged(CCVars.DiscordWhitelistApplicationWebhook, SetWebhookUrl, true);
+    }
+
+    private void SetWebhookUrl(string url)
+    {
+        _webhookUrl = url;
     }
 
     /// <summary>

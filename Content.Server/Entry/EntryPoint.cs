@@ -1,4 +1,5 @@
 using Content.Server._Qippe.ServerStatus;
+using Content.Server._Qippe.Whitelist;
 using Content.Server.Acz;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
@@ -81,6 +82,7 @@ namespace Content.Server.Entry
         [Dependency] private ServerFeedbackManager _feedbackManager = null!;
         [Dependency] private PreWrittenDocumentManager _documentManager = default!; // Starlight
         [Dependency] private ServerStatusManager _serverStatusManager = default!;
+        [Dependency] private WhitelistApplicationWebhook _whitelistApplicationWebhook = default!;
 
         public override void PreInit()
         {
@@ -135,6 +137,7 @@ namespace Content.Server.Entry
             _updateManager.Initialize();
             _playTimeTracking.Initialize();
             _watchlistWebhookManager.Initialize();
+            _whitelistApplicationWebhook.Initialize();
             _job.Initialize();
             _rateLimit.Initialize();
             _documentManager.Initialize(); // Starlight
