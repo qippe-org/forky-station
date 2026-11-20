@@ -37,6 +37,7 @@ using Content.Shared.Players.RateLimiting;
 using Content.Server._Qippe.ServerStatus;
 using QippeWhitelistManager = Content.Server._Qippe.Whitelist.WhitelistManager;
 using WhitelistGateManager = Content.Server._Qippe.Whitelist.WhitelistGateManager;
+using WhitelistApplicationWebhook = Content.Server._Qippe.Whitelist.WhitelistApplicationWebhook;
 
 namespace Content.Server.IoC;
 
@@ -94,6 +95,7 @@ internal static class ServerContentIoC
         deps.Register<WhitelistManager>();
         deps.Register<QippeWhitelistManager>();
         deps.Register<WhitelistGateManager>();
+        deps.Register<WhitelistApplicationWebhook>();
         deps.Register<ServerStatusManager>();
     }
 }

@@ -35,6 +35,7 @@ public sealed partial class WhitelistManager : IPostInjectInit
     [Dependency] private PlayerWhitelistManager _whitelist = default!;
     [Dependency] private ILogManager _logManager = default!;
     [Dependency] private WhitelistGateManager _gate = default!;
+    [Dependency] private WhitelistApplicationWebhook _webhook = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -64,6 +65,13 @@ public sealed partial class WhitelistManager : IPostInjectInit
         var application = await _db.AddWhitelistApplicationAsync(player, message);
         _sawmill.Info("New whitelist application #{Id} from {Player}.", application.Id, player);
         ApplicationsChanged?.Invoke();
+
+        // The insert does not fill in the player navigation, so reload the row for the name in the embed.
+        if (_webhook.IsConfigured)
+        {
+            var reloaded = await _db.GetWhitelistApplicationByPlayerAsync(player);
+            _webhook.Notify(reloaded ?? application, WhitelistApplicationWebhookEvent.Created);
+        }
 
         // The player may be sitting on the application screen, which should now stop offering the form.
         _gate.RefreshApplicationScreen(player);
@@ -116,6 +124,8 @@ public sealed partial class WhitelistManager : IPostInjectInit
             application.Id,
             player);
 
+        _webhook.Notify(application, WhitelistApplicationWebhookEvent.Approved);
+
         ApplicationsChanged?.Invoke();
         return (WhitelistApplicationResult.Success, application);
     }
@@ -139,6 +149,8 @@ public sealed partial class WhitelistManager : IPostInjectInit
             reviewer?.ToString() ?? "Server console",
             application.Id,
             new NetUserId(application.PlayerUserId));
+
+        _webhook.Notify(application, WhitelistApplicationWebhookEvent.Denied);
 
         ApplicationsChanged?.Invoke();
         return (WhitelistApplicationResult.Success, application);

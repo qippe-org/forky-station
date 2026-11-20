@@ -120,4 +120,11 @@ public sealed partial class CCVars
     public static readonly CVarDef<bool> DiscordNewsWebhookSendDuringRound =
         CVarDef.Create("discord.news_webhook_send_during_round", false, CVar.SERVERONLY);
 
+    /// <summary>
+    ///     URL of the Discord webhook which will relay whitelist application activity
+    ///     (submitted, approved and denied). If left empty, disables the webhook.
+    /// </summary>
+    public static readonly CVarDef<string> DiscordWhitelistApplicationWebhook =
+        CVarDef.Create("discord.whitelist_application_webhook", string.Empty, CVar.SERVERONLY | CVar.CONFIDENTIAL);
+
 }
