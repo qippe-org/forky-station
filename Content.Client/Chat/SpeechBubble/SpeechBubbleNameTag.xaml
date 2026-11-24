@@ -1,0 +1,11 @@
+<speechBubble:BaseSpeechBubble
+    xmlns="https://spacestation14.io"
+    xmlns:speechBubble="clr-namespace:Content.Client.Chat.SpeechBubble"
+    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls">
+    <PanelContainer Name="LabelPanel" StyleClasses="speechBox nameBox" VerticalAlignment="Bottom">
+        <BoxContainer Orientation="Vertical" Align="Center">
+            <PanelContainer Name="DividerPanel" StyleClasses="LowDivider" Margin="0 2.5 0 2.5" />
+            <controls:AlignedRichTextLabel Name="NameLabel" Margin="2" HorizontalAlignment="Center" StyleClasses="bubbleContent fontChatName"/>
+        </BoxContainer>
+    </PanelContainer>
+</speechBubble:BaseSpeechBubble>

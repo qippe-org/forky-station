@@ -21,10 +21,6 @@ public sealed class TooltipSheetlet<T> : Sheetlet<T> where T: PalettedStylesheet
             .IntoPatch(StyleBox.Margin.All, 2);
         tooltipBox.SetContentMarginOverride(StyleBox.Margin.Horizontal, 7);
 
-        var whisperBox = sheet.GetTextureOr(tooltipCfg.WhisperBoxPath, NanotrasenStylesheet.TextureRoot)
-            .IntoPatch(StyleBox.Margin.All, 2);
-        whisperBox.SetContentMarginOverride(StyleBox.Margin.Horizontal, 7);
-
         return
         [
             E<PanelContainer>()
@@ -44,21 +40,6 @@ public sealed class TooltipSheetlet<T> : Sheetlet<T> where T: PalettedStylesheet
             E<PanelContainer>()
                 .Class(ExamineSystem.StyleClassEntityTooltip)
                 .Panel(tooltipBox),
-            E<PanelContainer>()
-                .Class("speechBox", "sayBox")
-                .Panel(tooltipBox),
-            E<PanelContainer>()
-                .Class("speechBox", "whisperBox")
-                .Panel(whisperBox),
-
-            E<PanelContainer>()
-                .Class("speechBox", "whisperBox")
-                .ParentOf(E<RichTextLabel>().Class("bubbleContent"))
-                .Prop(Label.StylePropertyFont, sheet.BaseFont.GetFont(12, FontKind.Italic)),
-            E<PanelContainer>()
-                .Class("speechBox", "emoteBox")
-                .ParentOf(E<RichTextLabel>().Class("bubbleContent"))
-                .Prop(Label.StylePropertyFont, sheet.BaseFont.GetFont(12, FontKind.Italic)),
         ];
     }
 }

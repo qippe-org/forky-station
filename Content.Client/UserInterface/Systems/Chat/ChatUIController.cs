@@ -1,12 +1,13 @@
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using Content.Client._RMC14.Mentor; // RMC Mentor Chat Funky Port
 using Content.Client.Administration.Managers;
 using Content.Client.Chat;
 using Content.Client.Chat.Managers;
+using Content.Client.Chat.SpeechBubble;
 using Content.Client.Chat.TypingIndicator;
-using Content.Client.Chat.UI;
 using Content.Client.Examine;
 using Content.Client.Gameplay;
 using Content.Client.Ghost;
@@ -22,6 +23,7 @@ using Content.Shared.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Damage.ForceSay;
 using Content.Shared.Decals;
+using Content.Shared.IdentityManagement;
 using Content.Shared.Input;
 using Content.Shared.Radio;
 using Content.Shared.Roles.RoleCodeword;
@@ -59,6 +61,7 @@ public sealed partial class ChatUIController : UIController
     [Dependency] private IStateManager _state = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private IReplayRecordingManager _replayRecording = default!;
+    [Dependency] private IOverlayManager _overlayManager = default!;
 
     // RMC Mentor Chat Funky Port
     [Dependency] private StaffHelpUIController _staffHelpUI = default!;
@@ -70,6 +73,9 @@ public sealed partial class ChatUIController : UIController
     [UISystemDependency] private readonly TransformSystem? _transform = default;
     [UISystemDependency] private readonly MindSystem? _mindSystem = default!;
     [UISystemDependency] private readonly RoleCodewordSystem? _roleCodewordSystem = default!;
+    [UISystemDependency] private readonly SpriteSystem? _sprite = default!;
+
+    private SpeechBubbleOverlay? _speechBubbleOverlay;
 
     private static readonly ProtoId<ColorPalettePrototype> ChatNamePalette = "ChatNames";
     private string[] _chatNameColors = default!;
@@ -120,21 +126,30 @@ public sealed partial class ChatUIController : UIController
     /// <summary>
     ///     Factor multiplied by speech bubble char length to add to delay.
     /// </summary>
-    private const float BubbleDelayFactor = 0.8f / SingleBubbleCharLimit;
+    private const float BubbleDelayFactor = 0.35f / SingleBubbleCharLimit;
 
     /// <summary>
     ///     The max amount of speech bubbles over a single entity at once.
     /// </summary>
     private const int SpeechBubbleCap = 4;
 
-    private LayoutContainer _speechBubbleRoot = default!;
-
     /// <summary>
     ///     Speech bubbles that are currently visible on screen.
-    ///     We track them to push them up when new ones get added.
+    ///     Rendering is handled in <see cref="SpeechBubbleOverlay"/>.
     /// </summary>
-    private readonly Dictionary<EntityUid, List<SpeechBubble>> _activeSpeechBubbles =
-        new();
+    public readonly Dictionary<EntityUid, List<SpeechBubble>> ActiveSpeechBubbles = new();
+
+    /// <summary>
+    ///     Speech bubble name tags currently visible on screen.
+    ///     These are the name tags that appear UNDER the stack of messages.
+    /// </summary>
+    public readonly Dictionary<EntityUid, SpeechBubbleNameTag> ActiveSpeechBubbleNameTags = new();
+
+    /// <summary>
+    ///     Whether or not name tags are enabled for speech bubbles.
+    ///     These appear underneath the stack of messages.
+    /// </summary>
+    public bool ChatBubbleNameTags;
 
     /// <summary>
     ///     Speech bubbles that are to-be-sent because of the "rate limit" they have.
@@ -193,9 +208,11 @@ public sealed partial class ChatUIController : UIController
         _net.RegisterNetMessage<MsgDeleteChatMessagesBy>(OnDeleteChatMessagesBy);
         SubscribeNetworkEvent<DamageForceSayEvent>(OnDamageForceSay);
         _config.OnValueChanged(CCVars.ChatEnableColorName, (value) => { _chatNameColorsEnabled = value; });
+        _config.OnValueChanged(CCVars.ChatBubbleEnableNames, (value) => { ChatBubbleNameTags = value; });
+
         _chatNameColorsEnabled = _config.GetCVar(CCVars.ChatEnableColorName);
         ChatNameColorsEnabled = _chatNameColorsEnabled;
-        _speechBubbleRoot = new LayoutContainer();
+        ChatBubbleNameTags = _config.GetCVar(CCVars.ChatBubbleEnableNames);
 
         UpdateChannelPermissions();
 
@@ -259,15 +276,21 @@ public sealed partial class ChatUIController : UIController
     {
         SetMainChat(true);
 
-        var viewportContainer = UIManager.ActiveScreen!.FindControl<LayoutContainer>("ViewportContainer");
-        SetSpeechBubbleRoot(viewportContainer);
-
         SetChatWindowOpacity(_config.GetCVar(CCVars.ChatWindowOpacity));
+
+        if (_examine == null || _sprite == null || _transform == null)
+            return;
+
+        _speechBubbleOverlay = new SpeechBubbleOverlay(_examine, _sprite, _transform);
+        _overlayManager.AddOverlay(_speechBubbleOverlay);
     }
 
     public void OnScreenUnload()
     {
         SetMainChat(false);
+
+        _overlayManager.RemoveOverlay<SpeechBubbleOverlay>();
+        _speechBubbleOverlay = null;
     }
 
     private void OnChatWindowOpacityChanged(float opacity)
@@ -428,14 +451,6 @@ public sealed partial class ChatUIController : UIController
         UpdateChannelPermissions();
     }
 
-    public void SetSpeechBubbleRoot(LayoutContainer root)
-    {
-        _speechBubbleRoot.Orphan();
-        root.AddChild(_speechBubbleRoot);
-        LayoutContainer.SetAnchorPreset(_speechBubbleRoot, LayoutContainer.LayoutPreset.Wide);
-        _speechBubbleRoot.SetPositionLast();
-    }
-
     private void OnAttachedChanged(EntityUid uid)
     {
         UpdateChannelPermissions();
@@ -456,42 +471,126 @@ public sealed partial class ChatUIController : UIController
         EnqueueSpeechBubble(ent, msg, speechType);
     }
 
-    private void CreateSpeechBubble(EntityUid entity, SpeechBubbleData speechData)
+    /// <summary>
+    ///     Resolves the plain-text speaker name shown underneath a speech bubble.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The name is taken from the <c>[BubbleHeader]</c> of the wrapped message, but it cannot simply be
+    ///         stripped of markup: with <c>chat.chat_name_links</c> enabled (the default) the server wraps the name
+    ///         as <c>[textlink="Bob" entity="..." entitynamecolor="true"]</c>, where the display text lives only in an
+    ///         <em>attribute</em> and carries no child text. Stripping markup therefore yields an empty string and the
+    ///         name tag renders blank.
+    ///     </para>
+    ///     <para>
+    ///         Walking the parsed nodes and preferring the <c>textlink</c> attribute reproduces the name that the chat
+    ///         window shows, regardless of how the header was built.
+    ///     </para>
+    /// </remarks>
+    private static string GetSpeechBubbleName(ChatMessage message)
     {
-        var bubble =
-            SpeechBubble.CreateSpeechBubble(speechData.Type, speechData.Message, entity);
+        var header = SharedChatSystem.GetStringInsideTag(message, "BubbleHeader");
+        if (string.IsNullOrWhiteSpace(header))
+            return string.Empty;
 
-        bubble.OnDied += SpeechBubbleDied;
+        var formatted = FormattedMessage.FromMarkupPermissive(header);
 
-        if (_activeSpeechBubbles.TryGetValue(entity, out var existing))
+        // Prefer an explicit textlink label, then fall back to plain text nodes.
+        var textLinkName = string.Empty;
+        var plainText = new StringBuilder();
+
+        foreach (var node in formatted.Nodes)
         {
-            // Push up existing bubbles above the mob's head.
-            foreach (var existingBubble in existing)
+            if (node.Name == null)
             {
-                existingBubble.VerticalOffset += bubble.ContentSize.Y;
+                plainText.Append(node.Value.StringValue);
+                continue;
             }
+
+            if (node.Closing || textLinkName.Length != 0)
+                continue;
+
+            // The link's display text is the node value: [textlink="Bob" entity="..."].
+            if (node.Name == "textlink" && node.Value.TryGetString(out var linkText))
+                textLinkName = linkText;
         }
-        else
+
+        var name = textLinkName.Length != 0 ? textLinkName : plainText.ToString();
+        return name.Trim();
+    }
+
+    private void CreateNuSpeechBubble(EntityUid entity, SpeechBubbleData speechData)
+    {
+        var name = GetSpeechBubbleName(speechData.Message);
+
+        // Channels like LOOC put the speaker name inline instead of inside a [BubbleHeader], so fall back to the
+        // identity name rather than silently dropping the tag. Mirrors what the server uses for the inline name.
+        if (string.IsNullOrWhiteSpace(name))
+            name = Identity.Name(entity, EntityManager);
+
+        var nameColor = GetNameColor(name);
+        Color.TryFromHex(nameColor, out var color);
+
+        if (!ActiveSpeechBubbles.TryGetValue(entity, out var existing))
         {
             existing = new List<SpeechBubble>();
-            _activeSpeechBubbles.Add(entity, existing);
+            ActiveSpeechBubbles.Add(entity, existing);
+        }
+
+        var bubble = new SpeechBubble(speechData.Message, speechData.Type, name, entity, color);
+        bubble.OnDied += NuSpeechBubbleDied;
+
+        // Show names unless we're in a channel that already includes them inline.
+        // Emotes do, as does dead chat.
+        if (speechData.Message.Channel != ChatChannel.Emotes &&
+            speechData.Message.Channel != ChatChannel.Dead)
+        {
+            // Add a name tag if they are enabled. Skip it entirely when the header has no displayable name,
+            // otherwise an empty box would be drawn under the bubble.
+            if (ChatBubbleNameTags && !string.IsNullOrWhiteSpace(name))
+            {
+                if (!ActiveSpeechBubbleNameTags.ContainsKey(entity))
+                {
+                    // The constructor already lays the tag out, so no extra Update is needed here.
+                    var nameTag = new SpeechBubbleNameTag(entity, name, color);
+                    ActiveSpeechBubbleNameTags.Add(entity, nameTag);
+                    nameTag.OnDied += NuSpeechBubbleNameTagDied;
+                }
+
+                if (ActiveSpeechBubbleNameTags.TryGetValue(entity, out var existingNameTag))
+                {
+                    existingNameTag.SetDeathTime(bubble.DeathTime);
+
+                    // In case the name changes mid conversation.
+                    existingNameTag.Update(name, color);
+                }
+            }
+            else if (ActiveSpeechBubbleNameTags.TryGetValue(entity, out var staleNameTag))
+            {
+                // The name stopped being displayable, so drop the tag rather than show a blank one.
+                RemoveNuSpeechBubbleNameTag(entity, staleNameTag);
+            }
         }
 
         existing.Add(bubble);
-        _speechBubbleRoot.AddChild(bubble);
 
         if (existing.Count > SpeechBubbleCap)
         {
-            // Get the next speech bubble to fade
-            // Any speech bubbles before it are already fading
+            // Get the next speech bubble to fade.
+            // Any speech bubbles before it are already fading.
             var last = existing[^(SpeechBubbleCap + 1)];
             last.FadeNow();
         }
     }
 
-    private void SpeechBubbleDied(EntityUid entity, SpeechBubble bubble)
+    private void NuSpeechBubbleNameTagDied(EntityUid entity, BaseSpeechBubble tag)
     {
-        RemoveSpeechBubble(entity, bubble);
+        RemoveNuSpeechBubbleNameTag(entity, tag);
+    }
+
+    private void NuSpeechBubbleDied(EntityUid entity, BaseSpeechBubble bubble)
+    {
+        RemoveNuSpeechBubble(entity, bubble);
     }
 
     private void EnqueueSpeechBubble(EntityUid entity, ChatMessage message, SpeechBubble.SpeechType speechType)
@@ -509,17 +608,26 @@ public sealed partial class ChatUIController : UIController
         queueData.MessageQueue.Enqueue(new SpeechBubbleData(message, speechType));
     }
 
-    public void RemoveSpeechBubble(EntityUid entityUid, SpeechBubble bubble)
+    public void RemoveNuSpeechBubble(EntityUid entityUid, BaseSpeechBubble bubble)
     {
-        bubble.Dispose();
+        if (bubble is not SpeechBubble speechBubble)
+            return;
 
-        var list = _activeSpeechBubbles[entityUid];
-        list.Remove(bubble);
+        speechBubble.Dispose();
+
+        var list = ActiveSpeechBubbles[entityUid];
+        list.Remove(speechBubble);
 
         if (list.Count == 0)
         {
-            _activeSpeechBubbles.Remove(entityUid);
+            ActiveSpeechBubbles.Remove(entityUid);
         }
+    }
+
+    public void RemoveNuSpeechBubbleNameTag(EntityUid entityUid, BaseSpeechBubble bubble)
+    {
+        bubble.Dispose();
+        ActiveSpeechBubbleNameTags.Remove(entityUid);
     }
 
     private void UpdateChannelPermissions()
@@ -646,52 +754,7 @@ public sealed partial class ChatUIController : UIController
 
             // We keep the queue around while it has 0 items. This allows us to keep the timer.
             // When the timer hits 0 and there's no messages left, THEN we can clear it up.
-            CreateSpeechBubble(entity, msg);
-        }
-
-        var player = _player.LocalEntity;
-        var predicate = static (EntityUid uid, (EntityUid compOwner, EntityUid? attachedEntity) data)
-            => uid == data.compOwner || uid == data.attachedEntity;
-        var playerPos = player != null
-            ? _eye.CurrentEye.Position
-            : MapCoordinates.Nullspace;
-
-        var occluded = player != null && _examine.IsOccluded(player.Value);
-
-        foreach (var (ent, bubs) in _activeSpeechBubbles)
-        {
-            if (EntityManager.Deleted(ent))
-            {
-                SetBubbles(bubs, false);
-                continue;
-            }
-
-            if (ent == player)
-            {
-                SetBubbles(bubs, true);
-                continue;
-            }
-
-            var otherPos = _transform?.GetMapCoordinates(ent) ?? MapCoordinates.Nullspace;
-
-            if (occluded && !_examine.InRangeUnOccluded(
-                    playerPos,
-                    otherPos, 0f,
-                    (ent, player), predicate))
-            {
-                SetBubbles(bubs, false);
-                continue;
-            }
-
-            SetBubbles(bubs, true);
-        }
-    }
-
-    private void SetBubbles(List<SpeechBubble> bubbles, bool visible)
-    {
-        foreach (var bubble in bubbles)
-        {
-            bubble.Visible = visible;
+            CreateNuSpeechBubble(entity, msg);
         }
     }
 

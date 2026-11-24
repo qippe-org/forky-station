@@ -61,8 +61,7 @@ ui-options-show-combat-mode-indicators = Show combat mode indicators with cursor
 ui-options-opaque-storage-window = Opaque storage window
 ui-options-show-ooc-patron-color = Show OOC Patreon color
 ui-options-show-looc-on-head = Show LOOC chat above characters head
-ui-options-fancy-speech = Show names in speech bubbles
-ui-options-fancy-name-background = Add background to speech bubble names
+ui-options-chat-bubble-names = Show names below overhead chat text
 ui-options-vsync = VSync
 ui-options-max-fps = Maximum FPS:
 ui-options-max-fps-display-rate = Display Rate
@@ -424,8 +423,7 @@ ui-options-interaction-outline-color-example = This is the outline color.
 ui-options-color-slider-default-button = Reset to default
 
 ui-options-chat-window-opacity = Chat window opacity
-ui-options-speech-bubble-text-opacity = Speech bubble text opacity
-ui-options-speech-bubble-speaker-opacity = Speech bubble speaker opacity
+ui-options-speech-bubble-background = Show a background behind overhead chat text
 ui-options-speech-bubble-background-opacity = Speech bubble background opacity
 
 ui-options-censor-nudity = Censor character nudity

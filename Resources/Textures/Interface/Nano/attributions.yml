@@ -7,3 +7,8 @@
   license: "CC-BY-SA-3.0"
   copyright: "Design by Janet Blackquill <uhhadd@gmail.com>"
   source: "https://github.com/sowelipililimute"
+
+- files: ["chat_bubble_background.png"]
+  license: "CC-BY-SA-3.0"
+  copyright: "Created by jessicamaybe for Space Station 14"
+  source: "https://github.com/jessicamaybe"

@@ -61,8 +61,7 @@ ui-options-show-combat-mode-indicators = Показать индикатор б�
 ui-options-opaque-storage-window = Непрозрачность окна хранилища
 ui-options-show-ooc-patron-color = Цветной ник в OOC для патронов с Patreon
 ui-options-show-looc-on-head = Показывать LOOC-чат над головами персонажей
-ui-options-fancy-speech = Показывать имена в облачках с текстом
-ui-options-fancy-name-background = Добавить фон облачкам с текстом
+ui-options-chat-bubble-names = Показывать имена под текстом чата над головой
 ui-options-vsync = Вертикальная синхронизация
 ui-options-max-fps = Максимум FPS:
 ui-options-max-fps-display-rate = Частота экрана
@@ -407,8 +406,7 @@ ui-options-disable-singulo-warp-tooltip = Отключает эффект иск
 ui-options-screen-shake-intensity = Интенсивность дрожания экрана
 
 ui-options-chat-window-opacity = Непрозрачность окна чата
-ui-options-speech-bubble-text-opacity = Непрозрачность текста речевого пузыря
-ui-options-speech-bubble-speaker-opacity = Непрозрачность диктора речевого пузыря
+ui-options-speech-bubble-background = Показывать фон за текстом чата над головой
 ui-options-speech-bubble-background-opacity = Непрозрачность фона речевого пузыря
 
 # funky custom interaction outlines
