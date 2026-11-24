@@ -1,2 +1,2 @@
-department-Logistics = Логистика
-department-InternalAffairs = Внутренние дела
+funky-department-Logistics = Логистика
+funky-department-InternalAffairs = Внутренние дела

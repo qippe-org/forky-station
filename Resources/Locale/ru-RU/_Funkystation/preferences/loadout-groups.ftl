@@ -1,46 +1,46 @@
 # Internal affairs
-loadout-group-xo-backpack = Исполнительный директор, рюкзак
+funky-loadout-group-xo-backpack = Исполнительный директор, рюкзак
 
 # Engineering
-fu-loadout-group-station-engineer-head = Старший инженер, голова
-fu-loadout-group-station-engineer-uniform = Старший инженер, комбинезон
+funky-loadout-group-station-engineer-uniform = Старший инженер, комбинезон
 
-fu-loadout-group-technical-assistant-head = Технический ассистент, голова
-fu-loadout-group-technical-assistant-uniform = Технический ассистент, комбинезон
-
-# Medical
-fu-loadout-group-medical-doctor-head = Врач, голова
-fu-loadout-group-medical-doctor-outerclothing = Врач, верхняя одежда
-fu-loadout-group-medical-doctor-uniform = Врач, комбинезон
-
-fu-loadout-group-chemist-outerclothing = Химик, верхняя одежда
-fu-loadout-group-chemist-uniform = Химик, комбинезон
-fu-loadout-group-chemist-gloves = Химик, перчатки
-fu-loadout-group-chemist-boots = Химик, обувь
-
-fu-loadout-group-cmo-head = Главный врач, голова
-fu-loadout-group-cmo-outerclothing = Главный врач, верхняя одежда
-fu-loadout-group-cmo-uniform = Главный врач, комбинезон
-
-fu-loadout-group-medical-intern-head = Интерн, голова
-fu-loadout-group-medical-intern-uniform = Интерн, комбинезон
-
-# Service
-fu-loadout-group-hd-head = Директор по гостеприимству, голова
-fu-loadout-group-hd-outerclothing = Директор по гостеприимству, верхняя одежда
-fu-loadout-group-hd-uniform = Директор по гостеприимству, комбинезон
-fu-loadout-group-hd-gloves = Директор по гостеприимству, перчатки
-fu-loadout-group-hd-shoes = Директор по гостеприимству, обувь
+funky-loadout-group-technical-assistant-head = Технический ассистент, голова
+funky-loadout-group-technical-assistant-uniform = Технический ассистент, комбинезон
 
 # Logistics
-fu-loadout-group-cargo-neck = Логистика, шея
+funky-loadout-group-cargo-neck = Логистика, шея
 
-fu-loadout-group-cargo-technician-outer-clothing = Грузчик, верхняя одежда
-fu-loadout-group-cargo-technician-uniform = Грузчик, комбинезон
+funky-loadout-group-cargo-technician-uniform = Грузчик, комбинезон
 
-fu-loadout-group-courier-head = Курьер, голова
-fu-loadout-group-courier-outer-clothing = Курьер, верхняя одежда
-fu-loadout-group-courier-uniform = Курьер, комбинезон
-fu-loadout-group-courier-shoes = Курьер, обувь
+funky-loadout-group-courier-head = Курьер, голова
+funky-loadout-group-courier-outer-clothing = Курьер, верхняя одежда
+funky-loadout-group-courier-uniform = Курьер, комбинезон
+funky-loadout-group-courier-shoes = Курьер, обувь
 
-fu-loadout-group-quartermaster-outer-clothing = Квартирмейстер, верхняя одежда
+# Medical
+funky-loadout-group-medical-doctor-outerclothing = Врач, верхняя одежда
+funky-loadout-group-medical-doctor-uniform = Врач, комбинезон
+
+funky-loadout-group-chemist-uniform = Химик, комбинезон
+funky-loadout-group-chemist-gloves = Химик, перчатки
+funky-loadout-group-chemist-boots = Химик, обувь
+
+funky-loadout-group-cmo-uniform = Главный врач, комбинезон
+
+funky-loadout-group-medical-intern-head = Интерн, голова
+funky-loadout-group-medical-intern-uniform = Интерн, комбинезон
+
+# Security
+funky-loadout-group-warden-neck = Смотритель, шея
+
+funky-loadout-group-security-neck = Служба безопасности, шея
+funky-loadout-group-security-gloves = Служба безопасности, перчатки
+
+funky-loadout-group-security-cadet-hat = Кадет СБ, голова
+
+# Service
+funky-loadout-group-hd-head = Директор по гостеприимству, голова
+funky-loadout-group-hd-outerclothing = Директор по гостеприимству, верхняя одежда
+funky-loadout-group-hd-uniform = Директор по гостеприимству, комбинезон
+funky-loadout-group-hd-gloves = Директор по гостеприимству, перчатки
+funky-loadout-group-hd-shoes = Директор по гостеприимству, обувь

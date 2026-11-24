@@ -161,9 +161,7 @@ loadout-group-warden-neck = Смотритель, шея
 loadout-group-warden-outerclothing = Смотритель, верхняя одежда
 
 loadout-group-security-head = Офицер СБ, голова
-loadout-group-security-neck = Офицер СБ, шея
 loadout-group-security-jumpsuit = Офицер СБ, комбинезон
-loadout-group-security-gloves = Офицер СБ, перчатки
 loadout-group-security-backpack = Офицер СБ, рюкзак
 loadout-group-security-belt = Офицер СБ, пояс
 loadout-group-security-outerclothing = Офицер СБ, верхняя одежда
@@ -175,7 +173,6 @@ loadout-group-detective-neck = Детектив, шея
 loadout-group-detective-jumpsuit = Детектив, комбинезон
 loadout-group-detective-outerclothing = Детектив, верхняя одежда
 
-loadout-group-security-cadet-hat = Кадет СБ, голова
 loadout-group-security-cadet-jumpsuit = Кадет СБ, комбинезон
 loadout-group-security-star = СБ, Звёздочка
 
